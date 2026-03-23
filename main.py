@@ -4,9 +4,20 @@ import requests
 import time
 import re
 import json
-import  subprocess
+import subprocess
 import os
 import sys
+
+def res():
+    response1 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C1%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=2&lang=zh-cn&v=1925&lang=zh').status_code
+    response2 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C0%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=1&lang=zh-cn&v=6229&lang=zh').status_code
+    response3 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C1%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=2&lang=zh-cn&v=1925&lang=zh').status_code
+    response4 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C0%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=1&lang=zh-cn&v=6229&lang=zh').status_code
+    if response1 == 200 or response2 == 200:
+        print(f'\n登陆成功！（{response1}）（{response2}）（{response3}）（{response4}）')
+    else:
+        print(f'\n请求出错！请手动登录！（{response1}）（{response2}）（{response3}）（{response4}）')
+        time.sleep(5)
 
 def get_real_exe_path():
     if hasattr(sys, '_MEIPASS'):
@@ -14,6 +25,12 @@ def get_real_exe_path():
         return os.path.dirname(exe_path)
     else:
         return os.path.dirname(os.path.abspath(__file__))
+
+def time_count(target):
+    for i in range(target, -1, -1):
+        sys.stdout.write(f'\r剩余 {i} 秒')
+        sys.stdout.flush()
+        time.sleep(1)
 
 real_dir = get_real_exe_path()
 os.chdir(real_dir)
@@ -49,14 +66,5 @@ with open('conf','a+',encoding='utf-8') as temp:
 
 connect_result = subprocess.run(["netsh", "wlan", "connect", "name=CMCC_BJKJDX_5G"],capture_output=True,encoding="gbk",errors="ignore")
 print('尝试连接到校园网（CMCC_BJKJDX_5G）...')
-time.sleep(7)
-
-def res():
-    response1 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C1%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=2&lang=zh-cn&v=1925&lang=zh').status_code
-    response2 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C0%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=1&lang=zh-cn&v=6229&lang=zh').status_code
-    if response1 == 200 or response2 == 200:
-        print(f'登陆成功！（{response1}）（{response2}）')
-    else:
-        print(f'请求出错！请手动登录！（{response1}）（{response2}）')
-        time.sleep(5)
+time_count(7)
 res()
