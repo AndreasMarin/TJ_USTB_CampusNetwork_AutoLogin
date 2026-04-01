@@ -9,14 +9,19 @@ import os
 import sys
 
 def res():
-    response1 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C1%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=2&lang=zh-cn&v=1925&lang=zh').status_code
-    response2 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C0%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=1&lang=zh-cn&v=6229&lang=zh').status_code
-    response3 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C1%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=2&lang=zh-cn&v=1925&lang=zh').status_code
-    response4 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C0%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=1&lang=zh-cn&v=6229&lang=zh').status_code
-    if response1 == 200 or response2 == 200:
-        print(f'\n登陆成功！（{response1}）（{response2}）（{response3}）（{response4}）')
-    else:
-        print(f'\n请求出错！请手动登录！（{response1}）（{response2}）（{response3}）（{response4}）')
+    try:
+        response1 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C1%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=2&lang=zh-cn&v=1925&lang=zh').status_code
+        response2 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C0%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=1&lang=zh-cn&v=6229&lang=zh').status_code
+        response3 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C1%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=2&lang=zh-cn&v=1925&lang=zh').status_code
+        response4 = requests.get(f'http://10.200.10.5:801/eportal/portal/login?callback=dr1003&login_method=1&user_account=%2C0%2C{main['user']}%40cmcc&user_password={main['pwd']}&wlan_user_ip=&wlan_user_ipv6=&wlan_user_mac=000000000000&wlan_ac_ip=&wlan_ac_name=&jsVersion=4.2.1&terminal_type=1&lang=zh-cn&v=6229&lang=zh').status_code
+        if response1 == 200 or response2 == 200 or response3 == 200 or response4 == 200:
+            print(f'\n请求成功！（{response1}）（{response2}）（{response3}）（{response4}）')
+        else:
+            print(f'\n请求出错！请手动登录！（{response1}）（{response2}）（{response3}）（{response4}）')
+            time.sleep(5)
+    except Exception as e:
+        print(f'\n请求出错：{type(e).__name__}')
+        print('请手动登录！')
         time.sleep(5)
 
 def get_real_exe_path():
@@ -37,13 +42,13 @@ os.chdir(real_dir)
 
 print("当前工作目录:", os.getcwd())
 
-with open('conf','a+',encoding='utf-8') as temp:
+with open('conf_main','a+',encoding='utf-8') as temp:
     temp.seek(0)
     content = temp.read()
     main = {'user':'0','pwd':'0'}
-    if len(content) == 0:
+    if len(content) < 40:
         check= 1
-        print('欢迎！检测到缺失配置文件，初始化中...')
+        print('欢迎！检测到缺失配置文件（conf_main），初始化中...')
         phone_pattern = re.compile(r'^1[3-9]\d{9}$')
         while check == 1:
             main['user'] = input('\n请输入您的账户（手机号）:').strip()
@@ -57,12 +62,20 @@ with open('conf','a+',encoding='utf-8') as temp:
         if len(main['pwd']) == 0:
             main['pwd'] = '123450'
         temp.write(json.dumps(main, ensure_ascii=False))
-        print('初始化完成！配置已保存到conf文件！')
+        print('初始化完成！配置已保存到conf_main文件！')
     else:
-        print('配置存在！开始发送请求！')
-        content = json.loads(content)
-        main['user'] = content['user']
-        main['pwd'] = content['pwd']
+        try:
+            content = json.loads(content)
+            main['user'] = content['user']
+            main['pwd'] = content['pwd']
+            main['count'] = content.get('count', '900')
+            print('配置存在，值守开始')
+        except:
+            print('配置损坏，请重启程序')
+            temp.truncate()
+            temp.seek(0)
+            time.sleep(3)
+            sys.exit()
 
 connect_result = subprocess.run(["netsh", "wlan", "connect", "name=CMCC_BJKJDX_5G"],capture_output=True,encoding="gbk",errors="ignore")
 print('尝试连接到校园网（CMCC_BJKJDX_5G）...')
